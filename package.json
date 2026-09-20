@@ -8,7 +8,7 @@
     "preview": "node server.mjs",
     "build": "node scripts/build.mjs",
     "android:add": "cap add android",
-    "android:sync": "cap sync android"
+    "android:sync": "cap sync android && node scripts/configure-android.mjs"
   },
   "dependencies": {
     "@capacitor/core": "8.5.2",
