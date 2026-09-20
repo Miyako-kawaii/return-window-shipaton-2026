@@ -1,44 +1,50 @@
 # Return Window
 
-A small app for remembering the return dates you enter for your purchases.
+A purchase is easy to forget until the day after its return deadline. Return Window keeps a small list of those dates, with an optional reminder before time runs out.
 
-This is a work-in-progress student project for Shipaton 2026. The web layer has passed 30 automated tests and browser checks for saving, reloading, resolving and reopening items. Native Android purchase, restore and notification delivery are not yet verified. The repository is not a claim of contest acceptance or a production-ready release.
+Enter the deadline the shop gave you, add a note if you need one, and come back when you decide to keep or return the item. You can search the list, mark something done, reopen it, or export a JSON backup. There is no inbox connection or receipt scanning.
 
-## Features
+This is my student project for Shipaton 2026. The Android debug build compiles and starts in an Android 36 emulator. There are 32 passing automated tests, plus browser checks for saving and reloading the list. **Purchasing, restoring purchases and receiving notifications on Android still need end-to-end testing.** The current APK is a development build.
 
-- Save an item name, a store-provided return date and optional notes.
-- Search, resolve and reopen items, with local persistence.
-- Export and import JSON backups.
-- Window Plus: one-time unlock implemented through RevenueCat's Test Store adapter, with local notification scheduling.
+## Try the list
 
-The Android demo is configured for RevenueCat's Test Store. Its public client key is in `src/public-config.mjs`; if you fork the app, replace it with your own Test Store key. Test purchases cost nothing. The adapter rejects production keys, so this prototype cannot take real payments.
-
-## Try it locally
-
-Run `npm ci --ignore-scripts`, then `npm run build` and `npm run preview`. Open http://127.0.0.1:8766 to try the local list. The preview serves only the built app; purchases and device notifications need Android.
-
-## Build
-
-Requires Node 22+ (tested with 24), JDK 21, Android SDK platform 36 and Build Tools 36.0.0. Install official Android tools and complete any required license acceptance yourself.
+Use Node 22 or newer; development and CI currently use Node 24.
 
 ```sh
 npm ci --ignore-scripts
-npm test
 npm run build
+npm run preview
+```
+
+Open http://127.0.0.1:8766. The browser version lets you try the list and backups. Purchases and device reminders need the Android app. To run the tests, use `npm test`.
+
+## Window Plus
+
+The app offers a one-time unlock for local reminders through RevenueCat. For this demo, it uses RevenueCat's **Test Store**, so a test purchase does not charge real money. The billing adapter deliberately rejects production keys.
+
+If you fork the project, replace the public client key in `src/public-config.mjs` with your own Test Store key. The configured offering needs a Lifetime package attached to the `window_plus` entitlement. Keep secret API keys out of the app.
+
+## Build an APK
+
+You need JDK 21, Android SDK platform 36 and Build Tools 36.0.0. Install the official tools, accept the SDK license, and set `ANDROID_HOME` to your SDK directory. After building the web app above:
+
+```sh
 npm run android:add
 npm run android:sync
 cd android
 ./gradlew --no-daemon assembleDebug
 ```
 
-On Windows use `gradlew.bat`. To rebuild an existing generated Android project, skip `android:add`. Set `ANDROID_HOME` to your SDK location. The generated project uses Capacitor's standard template and does not contain personal signing credentials.
+On Windows, use `gradlew.bat`. Skip `android:add` if you have already generated the Android project.
 
-The manual GitHub Actions workflow uses a standard Ubuntu runner, Java 21 and no Actions artifact/cache uploads. Successful debug builds are attached to an explicitly marked GitHub prerelease. A debug APK is intended for testing, not store publication.
+You can also start the repository's Android workflow manually. It builds on a standard Ubuntu runner and attaches the APK to a GitHub prerelease. It does not upload Actions caches or artifacts.
 
-## Privacy and limitations
+These cloud builds use disposable debug signing keys. A newer APK may require uninstalling the previous build, which removes its local data. Export anything you want to keep before changing builds. They are not store releases.
 
-Item titles, dates and notes are stored locally. JSON exports may contain your notes; share them carefully. Uninstalling or clearing app storage can remove the local list, so keep a backup. RevenueCat's SDK communicates with its service for purchases and entitlements; this is not an entirely offline application. No store receipt or email account is connected.
+## A few things to know
 
-Return dates are entered by the user and do not establish eligibility for a refund. Reminders depend on notification permission, device settings and periodically opening the app to refresh the schedule. Future native testing may require changes to this behavior.
+The item list stays on the device. Uninstalling the app or clearing its storage can erase it; JSON exports are your backup and can include your notes. RevenueCat communicates with its service to check purchases and entitlements, so the app is not entirely offline.
 
-Original project code is MIT-licensed. Third-party copyright and permission notices are in `THIRD_PARTY_NOTICES.txt`; native dependencies retain their own licenses. The calendar icon was drawn for this project using `scripts/make-icon.py` (optional Pillow dependency).
+A date in the app is a reminder, not a guarantee that a shop will accept a return. Notification permission and device settings affect reminders. The app currently refreshes its schedule when you use it, so open it periodically to pick up later dates.
+
+Original code is MIT-licensed. See `THIRD_PARTY_NOTICES.txt` for bundled JavaScript notices; native dependencies retain their own licenses. The calendar icon was drawn for this project with `scripts/make-icon.py`, which optionally uses Pillow.
