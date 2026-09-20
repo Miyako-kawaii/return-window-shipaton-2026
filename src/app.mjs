@@ -4,7 +4,7 @@ import {billing,purchase,restore,hasPlus} from './billing.mjs';
 import {createReminderService} from './reminder-service.mjs';
 const $=id=>document.getElementById(id);
 let items=[],filter='open',undo=null,toastTimer,storageOk=true;
-const reminders=createReminderService({native:()=>globalThis.Capacitor?.isNativePlatform?.()===true,storage:localStorage,hasPlus,loadPlugin:async()=>(await import('@capacitor/local-notifications')).LocalNotifications});
+const reminders=createReminderService({native:()=>globalThis.Capacitor?.isNativePlatform?.()===true,storage:localStorage,hasPlus,loadPlugin:()=>import('@capacitor/local-notifications')});
 async function refreshReminders(){try{const r=await reminders.refresh(items);$('reminder-state').textContent=r.message;}catch{$('reminder-state').textContent='Could not update reminders. Your item list is saved; retry from settings.';}}
 try{items=load(localStorage);}catch{storageOk=false;}
 function localDate(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}

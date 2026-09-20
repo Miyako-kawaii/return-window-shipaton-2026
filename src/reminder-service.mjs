@@ -5,7 +5,7 @@ export function createReminderService({native,storage,loadPlugin,hasPlus}) {
  const serial=fn=>{const result=queue.then(fn,fn);queue=result.catch(()=>{});return result;};
  async function refresh(items) {
   if(!native()) return {message:'On-device reminders need the Android app.'};
-  const plugin=await loadPlugin(),enabled=storage.getItem(KEY)==='on';
+  const {LocalNotifications:plugin}=await loadPlugin(),enabled=storage.getItem(KEY)==='on';
   let entitled=false;
   if(enabled){try{entitled=await hasPlus();}catch{
    await syncReminders(plugin,[],{enabled:false});
@@ -22,14 +22,14 @@ export function createReminderService({native,storage,loadPlugin,hasPlus}) {
   enable:items=>serial(async()=>{
    if(!native())return {message:'On-device reminders need the Android app.'};
    if(!await hasPlus())return {message:'Unlock Window Plus first.'};
-   const plugin=await loadPlugin();
+   const {LocalNotifications:plugin}=await loadPlugin();
    const permission=await plugin.requestPermissions();
    if(permission.display!=='granted')return {message:'Permission was not granted. Reminders remain off.'};
    storage.setItem(KEY,'on');return refresh(items);
   }),
   disable:()=>serial(async()=>{
    // Cancel first, then save: a storage failure must not leave unwanted alarms running.
-   if(native())await syncReminders(await loadPlugin(),[],{enabled:false});
+   if(native())await syncReminders((await loadPlugin()).LocalNotifications,[],{enabled:false});
    storage.setItem(KEY,'off');return {message:'Reminders are off.'};
   }),
  };

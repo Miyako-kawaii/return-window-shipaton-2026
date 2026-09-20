@@ -4,7 +4,7 @@ import {createReminderService} from '../src/reminder-service.mjs';
 function fixture({value='off',plus=true,permission='granted'}={}){
  const calls=[];let pref=value;
  const plugin={getPending:async()=>({notifications:[{id:110000}]}),cancel:async()=>calls.push('cancel'),checkPermissions:async()=>({display:permission}),requestPermissions:async()=>{calls.push('request');return {display:permission};},schedule:async()=>calls.push('schedule')};
- const service=createReminderService({native:()=>true,storage:{getItem:()=>pref,setItem:(_,v)=>{pref=v;}},hasPlus:async()=>plus,loadPlugin:async()=>plugin});
+ const service=createReminderService({native:()=>true,storage:{getItem:()=>pref,setItem:(_,v)=>{pref=v;}},hasPlus:async()=>plus,loadPlugin:async()=>({LocalNotifications:plugin})});
  return {service,calls,pref:()=>pref};
 }
 test('refresh does not request notification permission',async()=>{
@@ -21,4 +21,15 @@ test('enable and disable requests are serialized so last action wins',async()=>{
 });
 test('revoked entitlement cancels old reminders',async()=>{
  const f=fixture({value:'on',plus:false});await f.service.refresh([]);assert.deepEqual(f.calls,['cancel']);
+});
+
+test('notification proxy stays inside module namespace across async loading',async()=>{
+ let thenReads=0;
+ const plugin=new Proxy({getPending:async()=>({notifications:[]})},{get(target,name){
+  if(name==='then'){thenReads++;throw new Error('Native plugin has no then method');}return target[name];
+ }});
+ const service=createReminderService({native:()=>true,storage:{getItem:()=> 'off',setItem:()=>{}},hasPlus:async()=>false,loadPlugin:async()=>({LocalNotifications:plugin})});
+ assert.equal((await service.refresh([])).message,'Reminders are off.');
+ await service.disable();
+ assert.equal(thenReads,0);
 });

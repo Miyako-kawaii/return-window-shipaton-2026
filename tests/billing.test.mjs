@@ -13,13 +13,23 @@ test('production key rejected before SDK initialization',async()=>{
 test('configured native service preserves offer price and initializes once',async()=>{
  let configurations=0,purchased;
  const sdk={configure:async()=>{configurations++;},getCustomerInfo:async()=>({customerInfo:{}}),getOfferings:async()=>({current:{availablePackages:[pack]}}),purchasePackage:async options=>{purchased=options;return {customerInfo:{}};}};
- const s=createBillingService({isNative:()=>true,publicKey:'test_demo',loadSDK:async()=>sdk});
+ const s=createBillingService({isNative:()=>true,publicKey:'test_demo',loadSDK:async()=>({Purchases:sdk})});
  assert.equal((await s.view()).price,'€2.99');await s.view();
  assert.equal(configurations,1);assert.equal((await s.purchase()).status,'pending');assert.deepEqual(purchased,{aPackage:pack});
 });
 test('failed initialization can retry without granting access',async()=>{
  let attempts=0;
  const sdk={configure:async()=>{if(++attempts===1)throw new Error('offline');},getCustomerInfo:async()=>({customerInfo:{entitlements:{active:{window_plus:{isActive:true}}}}})};
- const s=createBillingService({isNative:()=>true,publicKey:'test_demo',loadSDK:async()=>sdk});
+ const s=createBillingService({isNative:()=>true,publicKey:'test_demo',loadSDK:async()=>({Purchases:sdk})});
  assert.equal((await s.view()).available,false);assert.equal((await s.view()).active,true);assert.equal(attempts,2);
+});
+
+test('native proxy is never assimilated as a Promise',async()=>{
+ let thenReads=0;
+ const sdk=new Proxy({configure:async()=>{},getCustomerInfo:async()=>({customerInfo:{}}),getOfferings:async()=>({current:{availablePackages:[pack]}})}, {
+  get(target,name){if(name==='then'){thenReads++;throw new Error('Native plugin has no then method');}return target[name];}
+ });
+ const s=createBillingService({isNative:()=>true,publicKey:'test_demo',loadSDK:async()=>({Purchases:sdk})});
+ assert.equal((await s.view()).available,true);
+ assert.equal(thenReads,0);
 });

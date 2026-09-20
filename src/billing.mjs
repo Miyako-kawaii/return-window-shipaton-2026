@@ -8,7 +8,7 @@ export function createBillingService({isNative,publicKey,loadSDK}) {
     // This project is a sandbox demo. Production keys are deliberately rejected.
     if (!/^test_[A-Za-z0-9]+$/.test(publicKey)) throw new Error('Test Store configuration is missing.');
     if (!initializing) initializing=(async()=>{
-      const sdk=await loadSDK();
+      const {Purchases:sdk}=await loadSDK();
       await sdk.configure({apiKey:publicKey});
       controller=createPurchaseController(sdk);
       return controller;
@@ -41,7 +41,7 @@ export function createBillingService({isNative,publicKey,loadSDK}) {
 const service=createBillingService({
   isNative:()=>globalThis.Capacitor?.isNativePlatform?.()===true,
   publicKey:TEST_STORE_PUBLIC_KEY,
-  loadSDK:async()=> (await import('@revenuecat/purchases-capacitor')).Purchases,
+  loadSDK:()=>import('@revenuecat/purchases-capacitor'),
 });
 export const billing=()=>service.view();
 export const purchase=()=>service.purchase();
