@@ -1,0 +1,6 @@
+{
+  "appId": "app.returnwindow.mobile",
+  "appName": "Return Window",
+  "webDir": "dist",
+  "server": { "androidScheme": "https" }
+}
