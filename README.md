@@ -13,6 +13,10 @@ This is a work-in-progress student project for Shipaton 2026. The web layer has 
 
 The public Test Store key is deliberately blank in `src/public-config.mjs`. Purchases are unavailable until the app is configured and built for Android. The adapter rejects production keys. No real purchase is offered in this prototype.
 
+## Try it locally
+
+Run `npm ci --ignore-scripts`, then `npm run build` and `npm run preview`. Open http://127.0.0.1:8766 to try the local list. The preview serves only the built app; purchases and device notifications need Android.
+
 ## Build
 
 Requires Node 22+ (tested with 24), JDK 21, Android SDK platform 36 and Build Tools 36.0.0. Install official Android tools and complete any required license acceptance yourself.
