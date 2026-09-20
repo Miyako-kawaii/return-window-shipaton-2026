@@ -11,7 +11,7 @@ This is a work-in-progress student project for Shipaton 2026. The web layer has 
 - Export and import JSON backups.
 - Window Plus: one-time unlock implemented through RevenueCat's Test Store adapter, with local notification scheduling.
 
-The public Test Store key is deliberately blank in `src/public-config.mjs`. Purchases are unavailable until the app is configured and built for Android. The adapter rejects production keys. No real purchase is offered in this prototype.
+The Android demo is configured for RevenueCat's Test Store. Its public client key is in `src/public-config.mjs`; if you fork the app, replace it with your own Test Store key. Test purchases cost nothing. The adapter rejects production keys, so this prototype cannot take real payments.
 
 ## Try it locally
 

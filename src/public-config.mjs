@@ -1,3 +1,3 @@
-// Only a public RevenueCat Test Store SDK key belongs here. Never a secret API key.
-// Empty by default: builds without explicit sandbox configuration cannot purchase.
-export const TEST_STORE_PUBLIC_KEY = '';
+// Public client SDK key for this demo's RevenueCat Test Store (not a secret key).
+// Test purchases do not charge money. Production keys are rejected by billing.mjs.
+export const TEST_STORE_PUBLIC_KEY = 'test_pcXmcAFFaGGfzNPVvNdUjZUDVwZ';
