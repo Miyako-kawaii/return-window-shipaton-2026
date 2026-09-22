@@ -51,4 +51,4 @@ jobs:
           sha256sum return-window-debug.apk > SHA256SUMS.txt
           gh release create "debug-${GITHUB_RUN_ID}" return-window-debug.apk SHA256SUMS.txt \
             --target "$GITHUB_SHA" --prerelease --title "Debug build ${GITHUB_RUN_ID}" \
-            --notes 'Development APK. Native purchases and notification delivery are not yet verified. Uses RevenueCat Test Store only; no real charges; this is not a production or final contest release.'
+            --notes 'Development APK. Uses RevenueCat Test Store only; no real charges. Restoration and notification delivery still need native validation; see README for tested behavior. This is not a production or final contest release.'

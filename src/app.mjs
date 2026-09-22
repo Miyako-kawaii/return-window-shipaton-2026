@@ -48,12 +48,23 @@ $('export').onclick=()=>{try{const data=storageOk?backup(items):localStorage.get
 $('import').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>1000000)throw new Error('Backup is too large (1 MB maximum).');const imported=parseBackup(await file.text()),next=mergeItems(items,imported);if(next.length>1000)throw new Error('Maximum 1,000 items per device.');commit(next,`${next.length-items.length} new items imported.`);}catch(err){message(`Import failed: ${err.message}`);}finally{e.target.value='';}};
 $('demo').onclick=()=>{if(items.length)return;const n=dayNumber(localDate()),date=offset=>new Date((n+offset)*86400000).toISOString().slice(0,10);commit([{title:'Linen weekend shirt',deadline:date(1),note:'Sample item · Check the fit before removing the tags.'},{title:'Desk lamp',deadline:date(5),note:'Sample item · Try the warmer bulb first.'},{title:'Running shoes',deadline:date(-1),note:'Sample item · Check with the store before assuming a return is still possible.'}].map(x=>createItem(x,crypto.randomUUID())),'Sample items added.');};
 let purchaseBusy=false;
+function purchaseMessage(text){
+ for(const id of ['purchase-result','restore-result'])$(id).textContent=text;
+ if(!$('plus-dialog').open&&!$('settings-dialog').open)message(text);
+}
 async function showPlus(){if(!$('plus-dialog').open)$('plus-dialog').showModal();$('buy').disabled=true;$('billing-status').textContent='Checking availability…';const state=await billing();$('billing-status').textContent=state.message;$('buy').disabled=purchaseBusy||!state.available;$('buy').textContent=state.available?`Test unlock · ${state.price}`:state.label||'Not available in this build';}
 async function purchaseAction(action){
- if(purchaseBusy)return;purchaseBusy=true;$('buy').disabled=true;
- try{const result=await action();message(({unlocked:'Test purchase confirmed.',restored:'Test purchase restored.',cancelled:'Purchase cancelled.',pending:'Purchase has not unlocked Plus yet. Try restoring later.','not-found':'No active Plus purchase found.',busy:'A purchase action is already running.'})[result.status]||'Please try again.');}
- catch{message('The purchase action could not be completed. Check your connection and retry or restore.');}
- finally{purchaseBusy=false;if($('plus-dialog').open)await showPlus();}
+ if(purchaseBusy)return;
+ purchaseBusy=true;
+ for(const id of ['buy','restore','restore-plus'])$(id).disabled=true;
+ purchaseMessage(action===restore?'Restoring your test purchase…':'Waiting for the test purchase…');
+ try{const result=await action();purchaseMessage(({unlocked:'Test purchase confirmed.',restored:'Test purchase restored.',cancelled:'Purchase cancelled.',pending:'Purchase has not unlocked Plus yet. Try restoring later.','not-found':'No active Plus purchase found.',busy:'A purchase action is already running.'})[result.status]||'Please try again.');}
+ catch{purchaseMessage('The purchase action could not be completed. Check your connection and retry or restore.');}
+ finally{
+  purchaseBusy=false;
+  for(const id of ['restore','restore-plus'])$(id).disabled=false;
+  if($('plus-dialog').open)await showPlus();
+ }
 }
 $('plus').onclick=showPlus;$('buy').onclick=()=>purchaseAction(purchase);$('restore').onclick=$('restore-plus').onclick=()=>purchaseAction(restore);
 $('reminders-on').onclick=async()=>{try{$('reminder-state').textContent=(await reminders.enable(items)).message;}catch{$('reminder-state').textContent='Could not enable reminders. Check Plus access, permissions and your connection.';}};

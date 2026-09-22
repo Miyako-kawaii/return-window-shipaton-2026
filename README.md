@@ -4,7 +4,7 @@ A purchase is easy to forget until the day after its return deadline. Return Win
 
 Enter the deadline the shop gave you, add a note if you need one, and come back when you decide to keep or return the item. You can search the list, mark something done, reopen it, or export a JSON backup. There is no inbox connection or receipt scanning.
 
-This is my student project for Shipaton 2026. The Android debug build compiles and starts in an Android 36 emulator. There are 32 passing automated tests, plus browser checks for saving and reloading the list. **Purchasing, restoring purchases and receiving notifications on Android still need end-to-end testing.** The current APK is a development build.
+This is my student project for Shipaton 2026. The Android debug build runs in an Android 36 emulator. A successful Test Store purchase unlocked Plus; a failed purchase did not. There are also 32 passing automated tests and browser checks for saving and reloading the list. Purchase results now appear inside the open dialog, where they remain visible after the offer refreshes. **Restoring purchases and receiving notifications on Android still need end-to-end testing.** The current APK is a development build.
 
 ## Try the list
 
