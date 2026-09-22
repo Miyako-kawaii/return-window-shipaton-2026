@@ -21,6 +21,9 @@ export function planReminders(items, now = new Date(), limit = 48) {
   reminders.sort((a,b)=>a.at-b.at || a.itemId.localeCompare(b.itemId) || a.before-b.before);
   return {notifications:reminders.slice(0,limit).map((r,index)=>({
     id:110000+index, title:r.title, body:r.body,
+    // Approximate morning reminders do not need Android's special alarm access.
+    // Explicitly opt out: plugin 8.3 defaults to prompting for exact alarms.
+    isExactNotification:false,
     schedule:{at:r.at}, extra:{itemId:r.itemId},
   })), deferred:Math.max(0,reminders.length-limit)};
 }

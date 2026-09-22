@@ -24,6 +24,22 @@ test('notification permission denial never schedules or requests permission impl
   const plugin={getPending:async()=>({notifications:[]}),checkPermissions:async()=>({display:'denied'})};
   assert.equal((await syncReminders(plugin,[item],{enabled:true})).permissionRequired,true);
 });
+test('refresh explicitly avoids the plugin default exact-alarm permission prompt',async()=>{
+  let scheduled=0;
+  const plugin={
+    getPending:async()=>({notifications:[]}),
+    checkPermissions:async()=>({display:'granted'}),
+    schedule:async({notifications})=>{
+      // Android plugin 8.3 opens system settings unless this is explicitly false.
+      assert.ok(notifications.every(n=>n.isExactNotification===false));
+      scheduled+=notifications.length;
+    },
+  };
+  const options={enabled:true,now:new Date(2026,2,1)};
+  assert.equal((await syncReminders(plugin,[item],options)).scheduled,2);
+  assert.equal((await syncReminders(plugin,[item],options)).scheduled,2);
+  assert.equal(scheduled,4);
+});
 const pack={packageType:'LIFETIME',product:{priceString:'$2.99'}};
 const info={entitlements:{active:{window_plus:{isActive:true}}}};
 test('only lifetime package is offered; SDK price is retained',async()=>{

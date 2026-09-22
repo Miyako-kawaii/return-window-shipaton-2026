@@ -4,7 +4,7 @@ A purchase is easy to forget until the day after its return deadline. Return Win
 
 Enter the deadline the shop gave you, add a note if you need one, and come back when you decide to keep or return the item. You can search the list, mark something done, reopen it, or export a JSON backup. There is no inbox connection or receipt scanning.
 
-This is my student project for Shipaton 2026. The Android debug build runs in an Android 36 emulator. A successful Test Store purchase unlocked Plus; a failed purchase did not. There are also 32 passing automated tests and browser checks for saving and reloading the list. Purchase results now appear inside the open dialog, where they remain visible after the offer refreshes. **Restoring purchases and receiving notifications on Android still need end-to-end testing.** The current APK is a development build.
+This is my student project for Shipaton 2026. The Android debug build runs in an Android 36 emulator. A successful Test Store purchase unlocked Plus; a failed purchase did not. There are also 33 passing automated tests and browser checks for saving and reloading the list. Purchase results now appear inside the open dialog, where they remain visible after the offer refreshes. Restoring the test purchase worked in the same Android installation; restoring on another device has not been tested. **Notification scheduling and delivery still need final native validation.** The current APK is a development build.
 
 ## Try the list
 
@@ -45,6 +45,6 @@ These cloud builds use disposable debug signing keys. A newer APK may require un
 
 The item list stays on the device. Uninstalling the app or clearing its storage can erase it; JSON exports are your backup and can include your notes. RevenueCat communicates with its service to check purchases and entitlements, so the app is not entirely offline.
 
-A date in the app is a reminder, not a guarantee that a shop will accept a return. Notification permission and device settings affect reminders. The app currently refreshes its schedule when you use it, so open it periodically to pick up later dates.
+A date in the app is a reminder, not a guarantee that a shop will accept a return. Notification permission and device settings affect reminders. Reminders use approximate alarms, so the app does not need special exact-alarm access. The app currently refreshes its schedule when you use it, so open it periodically to pick up later dates.
 
 Original code is MIT-licensed. See `THIRD_PARTY_NOTICES.txt` for bundled JavaScript notices; native dependencies retain their own licenses. The calendar icon was drawn for this project with `scripts/make-icon.py`, which optionally uses Pillow.
